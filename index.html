@@ -1,0 +1,265 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>정보 탐색 월드컵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+:root{/* Pantone Color of the Year: 2024 Peach Fuzz 13-1023 / 2025 Mocha Mousse 17-1230 */--peach:#ffbe98;--mocha:#a47864;--left:var(--peach);--right:var(--mocha);--gold:var(--peach);--ink:#2b1d17;--paper:#f5f1ee;--line:#e4dad3;--soft:#7a675d;
+--display:'Black Han Sans','Pretendard',system-ui,sans-serif;--body:'Pretendard',system-ui,'Malgun Gothic',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;word-break:keep-all}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--mocha);outline-offset:3px}
+main{max-width:1080px;margin:0 auto;padding:20px 16px 56px}
+
+/* 상단 바 */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.logo{font-family:var(--display);font-size:20px;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+.logo i{display:inline-flex;width:28px;height:28px;border-radius:50%;background:linear-gradient(90deg,var(--left) 50%,var(--right) 50%);color:#fff;font-style:normal;font-size:12px;align-items:center;justify-content:center}
+.class-tag{font-size:14px;font-weight:600;color:var(--soft)}
+
+/* 버튼 */
+.btn{border:0;border-radius:12px;padding:14px 22px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .12s,background .15s}
+.btn:active{transform:translateY(1px)}
+.btn-main{background:var(--ink);color:#fff}
+.btn-main:hover{background:#45322a}
+.btn-line{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-line:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* 홈 */
+.home{border-radius:28px;overflow:hidden;background:#fff;box-shadow:0 1px 0 var(--line)}
+.home-split{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:250px}
+.home-split > div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;padding:28px 12px}
+.home-split .l{background:var(--left);color:var(--ink)}.home-split .r{background:var(--right)}
+.home-split .big{font-size:64px;line-height:1}
+.home-split .nm{font-family:var(--display);font-size:clamp(20px,3vw,28px)}
+.home-body{padding:34px 24px 38px;text-align:center}
+.home h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
+.home p{color:var(--soft);margin:0 auto 22px;max-width:34em}
+.steps{display:flex;justify-content:center;gap:6px;margin:0 0 28px;padding:0;list-style:none;flex-wrap:wrap}
+.steps li{font-family:var(--display);font-size:15px;padding:7px 14px;border-radius:100px;background:var(--paper);color:var(--ink)}
+.steps li:last-child{background:var(--gold)}
+.note{font-size:14px;color:var(--soft);margin-top:16px!important}
+
+/* VS 메달 */
+.vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--display);font-size:34px;display:flex;align-items:center;justify-content:center;border:5px solid #fff;box-shadow:0 8px 24px rgba(43,29,23,.35);z-index:3;pointer-events:none;transition:opacity .25s,transform .35s}
+
+/* 대결 화면 */
+.status{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px}
+.round{font-family:var(--display);font-size:clamp(30px,5vw,44px);line-height:1}
+.count{font-weight:700;color:var(--soft);font-variant-numeric:tabular-nums}
+.count b{color:var(--ink)}
+.ticks{display:flex;gap:4px;margin-bottom:16px}
+.ticks span{flex:1;height:8px;border-radius:4px;background:var(--line);transition:background .3s}
+.ticks span.done{background:var(--ink)}
+.ticks span.now{background:var(--mocha)}
+.ask{text-align:center;color:var(--soft);margin:0 0 14px;font-weight:500}
+
+.arena{position:relative;display:flex;height:min(62vh,540px);min-height:380px;border-radius:28px;overflow:hidden;background:var(--ink);isolation:isolate}
+.side{position:relative;flex:1 1 0;min-width:0;border:0;padding:28px 20px;cursor:pointer;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;overflow:hidden;
+transition:flex-grow .5s cubic-bezier(.2,.9,.25,1),filter .35s,opacity .35s}
+.side.s0{background:var(--left);color:var(--ink)}.side.s1{background:var(--right)}
+.side.s0 .cat{background:rgba(43,29,23,.1)}.side.s0:focus-visible{outline-color:var(--ink)}.side.s1:focus-visible{outline-color:#fff}
+.side::before{content:attr(data-emoji);position:absolute;font-size:260px;line-height:1;opacity:.12;bottom:-40px;pointer-events:none;filter:grayscale(.2)}
+.side.s0::before{left:-40px}.side.s1::before{right:-40px}
+.side:hover{filter:brightness(1.08)}
+.side:focus-visible{outline-offset:-8px;outline-width:4px}
+.side .inner{display:flex;flex-direction:column;align-items:center;gap:12px;transition:transform .45s cubic-bezier(.2,.9,.25,1);max-width:22em}
+.side:hover .inner{transform:translateY(-4px)}
+.side .em{font-size:clamp(64px,9vw,104px);line-height:1;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
+.side .nm{font-family:var(--display);font-size:clamp(24px,3.6vw,40px);line-height:1.2;word-break:keep-all}
+.side .ds{font-size:clamp(15px,1.6vw,17px);font-weight:500;line-height:1.5;word-break:keep-all}
+.side .cat{font-size:13px;font-weight:700;padding:5px 12px;border-radius:100px;background:rgba(255,255,255,.18)}
+.side .key{position:absolute;top:16px;font-size:12px;font-weight:700;opacity:.6}
+.side.s0 .key{left:18px}.side.s1 .key{right:18px}
+
+/* 선택 연출 */
+.stamp{position:absolute;top:22px;left:50%;transform:translateX(-50%) rotate(-8deg) scale(.4);opacity:0;font-family:var(--display);font-size:26px;color:#fff;background:var(--ink);padding:6px 18px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:none}
+.arena.decided .vs{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.arena.decided .side{cursor:default}
+.side.picked{flex-grow:2.4;filter:none}
+.side.picked::after{content:"";position:absolute;inset:0;border:6px solid var(--ink);border-radius:inherit;pointer-events:none}
+.side.picked .inner{transform:scale(1.08)}
+.side.picked .stamp{animation:stamp .4s cubic-bezier(.3,1.6,.5,1) forwards}
+.side.dropped{flex-grow:.55;filter:grayscale(1) brightness(.5)}
+.side.dropped .inner{transform:scale(.88);opacity:.6}
+.side.dropped .ds,.side.dropped .cat{opacity:0}
+@keyframes stamp{to{opacity:1;transform:translateX(-50%) rotate(-8deg) scale(1)}}
+.arena.enter .side{animation:enter .35s ease-out both}
+.arena.enter .s1{animation-delay:.05s}
+@keyframes enter{from{opacity:0;transform:scale(.97)}}
+
+.tools{margin-top:18px}
+
+/* 라운드 전환 */
+.curtain{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(43,29,23,.92);color:#fff;z-index:20;animation:curtain 1.15s ease forwards;pointer-events:none}
+.curtain b{font-family:var(--display);font-weight:400;font-size:clamp(72px,16vw,160px);line-height:1;color:var(--gold);animation:pop 1.15s cubic-bezier(.3,1.4,.5,1) forwards}
+.curtain span{font-size:18px;font-weight:600}
+@keyframes curtain{0%{opacity:0}15%,80%{opacity:1}100%{opacity:0}}
+@keyframes pop{0%{transform:scale(.6)}25%{transform:scale(1)}100%{transform:scale(1.04)}}
+
+/* 결과 */
+.win{position:relative;border-radius:28px;background:var(--gold);padding:40px 24px 36px;text-align:center;margin-bottom:18px;overflow:hidden}
+.win .lead{font-weight:700;margin:0}
+.win .em{font-size:110px;line-height:1;margin:14px 0 6px}
+.win h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,8vw,72px);line-height:1.1;margin:0 0 10px;word-break:keep-all}
+.win .ds{margin:0 0 14px}
+.win .cat{display:inline-block;font-size:13px;font-weight:700;padding:5px 12px;border-radius:100px;background:rgba(43,29,23,.12)}
+.card{background:#fff;border-radius:24px;padding:28px 24px;margin-bottom:18px;box-shadow:0 1px 0 var(--line)}
+.card h2{font-family:var(--display);font-weight:400;font-size:26px;margin:0 0 6px}
+.card > p{color:var(--soft);margin:0 0 16px}
+.path{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.path li{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:var(--paper)}
+.path .r{font-family:var(--display);font-size:16px}
+.path .o{font-weight:600}
+.copy-msg{min-height:1.6em;text-align:center;font-weight:600;color:var(--ink);margin:12px 0 0}
+.shot{position:fixed;inset:0;z-index:30;background:rgba(43,29,23,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+.shot img{max-width:min(92vw,540px);max-height:72vh;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.shot p{color:#fff;margin:0;text-align:center}
+textarea{width:100%;min-height:120px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;padding:14px;font:inherit;resize:vertical;margin-bottom:16px}
+textarea:focus{outline:none;border-color:var(--ink)}
+.tip{text-align:center;font-size:14px;color:var(--soft);margin:16px 0 0}
+
+/* 모바일: 위아래 대결 */
+@media(max-width:640px){
+  main{padding:14px 12px 40px}
+  .class-tag{display:none}
+  .arena{flex-direction:column;height:calc(100svh - 250px);min-height:460px;border-radius:22px}
+  .side{padding:16px 14px;gap:8px}
+  .side .inner{gap:6px}
+  .side::before{font-size:180px;bottom:auto;top:50%;transform:translateY(-50%)}
+  .side .key{display:none}
+  .stamp{top:12px;font-size:20px}
+  .vs{width:62px;height:62px;font-size:24px;border-width:4px}
+  .home-split{min-height:190px}.home-split .big{font-size:46px}
+  .home-body{padding:26px 16px 30px}
+  .card{padding:22px 16px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style></head><body><main>
+<header class="top"><div class="logo"><i>VS</i>정보 탐색 월드컵</div><span class="class-tag">디지털 리터러시 수업</span></header>
+<div id="app"></div></main>
+<script>
+const ITEMS=[['네이버 검색','🔎','포털에서 웹문서·블로그·뉴스 검색','포털'],['구글 검색','🌐','다양한 웹사이트와 자료 검색','포털'],['다음 검색','🔍','뉴스·카페·웹 검색','포털'],['네이버 지식iN','💬','다른 이용자의 질문과 답변','커뮤니티'],['네이버 카페','☕','모임·게시판에서 정보 공유','커뮤니티'],['다음 카페','🔖','카페 게시판으로 정보 찾기','커뮤니티'],['학교 홈페이지/게시판','🏫','학교 공지와 질문 게시판','커뮤니티'],['네이버 블로그','✍️','개인의 경험과 후기','블로그'],['티스토리 블로그','📝','개인이 작성한 설명과 기록','블로그'],['유튜브 검색','▶️','동영상 설명과 사용법','영상'],['유튜브 쇼츠','📱','짧은 영상으로 정보 탐색','영상'],['인스타그램 검색','📸','게시물·릴스에서 정보 찾기','SNS'],['틱톡 검색','🎵','짧은 영상에서 정보 찾기','SNS'],['X(트위터) 검색','🐦','실시간 글과 정보 찾기','SNS'],['카카오톡 친구에게 질문','💭','친구에게 직접 물어보기','사람'],['학교 친구에게 질문','🧑‍🤝‍🧑','친구의 경험과 의견 듣기','사람'],['담당 교사에게 질문','👩‍🏫','교과 관련 설명 듣기','사람'],['가족에게 질문','🏠','가족의 경험과 지식 듣기','사람'],['챗GPT','🤖','생성형 AI와 대화하며 질문','AI'],['제미나이','✨','AI에 질문하고 답변 비교','AI'],['클로드','🧠','AI로 설명과 요약 얻기','AI'],['뤼튼','⚡','생성형 AI로 정보 찾기','AI'],['학교 도서관 책','📚','도서관의 인쇄 자료 탐색','도서'],['교과서','📘','교과서의 설명과 예시 확인','도서'],['백과사전','📖','체계적으로 정리된 설명','도서'],['전자책','📗','디지털 도서 검색','도서'],['국립중앙도서관 자료','🏛️','도서관 소장 자료 검색','공공'],['정부·공공기관 홈페이지','🏢','기관이 발표한 공식 정보','공공'],['뉴스 기사','📰','언론사가 보도한 정보','뉴스'],['팩트체크 전문 사이트','✅','주장의 사실 여부 검증','검증'],['학술 논문 검색','🎓','연구 결과와 근거 탐색','연구'],['위키백과','🌍','여러 사람이 편집하는 백과','백과']].map((x,i)=>({id:i,name:x[0],emoji:x[1],desc:x[2],category:x[3]}));
+const app=document.getElementById('app');let state=null,locked=false;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function save(){}
+function escapeHtml(t){return String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function roundName(n){return n===2?'결승':n===4?'4강':n+'강'}
+
+function home(){app.innerHTML=`<section class="home">
+<div class="home-split" aria-hidden="true"><div class="l"><span class="big">🤖</span><span class="nm">챗GPT</span></div><div class="r"><span class="big">📘</span><span class="nm">교과서</span></div><div class="vs">VS</div></div>
+<div class="home-body"><h1>정보 탐색 월드컵</h1>
+<p>검색 포털, 유튜브, 생성형 AI, 도서관까지 32가지 정보 탐색 방법이 맞붙어요.<br>둘 중 내가 더 자주 쓰거나 더 좋아하는 쪽을 골라 주세요.</p>
+<ol class="steps" aria-label="진행 순서"><li>32강</li><li>16강</li><li>8강</li><li>4강</li><li>결승</li></ol>
+<button class="btn btn-main" id="start">32강 시작하기</button>
+<p class="note">31번 고르면 나의 1위가 정해져요.<br>새로고침하면 처음부터 다시 시작해요.</p></div></section>`;
+document.getElementById('start').onclick=start}
+
+function start(){state={pool:shuffle(ITEMS.map(x=>x.id)),next:[],match:0,history:[],log:[],completed:false,reflection:''};save();render()}
+
+function render(enter){locked=false;if(!state){home();return}if(state.completed){result();return}
+let n=state.pool.length,total=n/2,a=ITEMS[state.pool[state.match*2]],b=ITEMS[state.pool[state.match*2+1]];
+let ticks=Array.from({length:total},(_,i)=>`<span class="${i<state.match?'done':i===state.match?'now':''}"></span>`).join('');
+app.innerHTML=`<section>
+<div class="status"><span class="round">${roundName(n)}</span><span class="count"><b>${state.match+1}</b> / ${total} 경기</span></div>
+<div class="ticks" aria-hidden="true">${ticks}</div>
+<p class="ask">더 자주 쓰거나 더 좋아하는 쪽을 누르세요</p>
+<div class="arena${enter?' enter':''}" id="arena">
+${[a,b].map((x,i)=>`<button class="side s${i}" data-choice="${i}" data-emoji="${x.emoji}" aria-label="${escapeHtml(x.name)} 선택">
+<span class="key" aria-hidden="true">${i?'→ 키':'← 키'}</span><span class="stamp" aria-hidden="true">선택!</span>
+<span class="inner"><span class="em" aria-hidden="true">${x.emoji}</span><span class="nm">${escapeHtml(x.name)}</span><span class="ds">${escapeHtml(x.desc)}</span><span class="cat">${escapeHtml(x.category)}</span></span></button>`).join('')}
+<div class="vs" aria-hidden="true">VS</div></div>
+<div class="row tools"><button class="btn btn-line" id="undo" ${state.history.length?'':'disabled'}>이전 선택 취소</button><button class="btn btn-line" id="restart">처음부터 다시</button></div></section>`;
+document.querySelectorAll('[data-choice]').forEach(btn=>btn.onclick=()=>choose(Number(btn.dataset.choice)));
+document.getElementById('undo').onclick=undo;
+document.getElementById('restart').onclick=()=>{if(confirm('처음부터 다시 시작할까요?'))start()}}
+
+function choose(i){if(locked||!state||state.completed)return;locked=true;
+const arena=document.getElementById('arena'),sides=arena.querySelectorAll('.side');
+arena.classList.add('decided');sides[i].classList.add('picked');sides[1-i].classList.add('dropped');
+setTimeout(()=>commit(i),reduced?200:850)}
+
+function commit(i){const n=state.pool.length,w=state.pool[state.match*2+i],l=state.pool[state.match*2+1-i];
+state.history.push(JSON.stringify({...state,history:[]}));
+state.log.push({round:roundName(n),winner:w,loser:l});
+state.next.push(w);state.match++;let newRound=false;
+if(state.match===n/2){state.pool=state.next;state.next=[];state.match=0;if(state.pool.length===1)state.completed=true;else newRound=true}
+save();
+if(newRound&&!reduced){curtain(state.pool.length);setTimeout(()=>render(true),1000)}else render(true)}
+
+function curtain(n){const c=document.createElement('div');c.className='curtain';c.setAttribute('role','status');
+c.innerHTML=`<b>${roundName(n)}</b><span>${n===2?'마지막 두 개가 남았어요':n+'개가 남았어요'}</span>`;document.body.appendChild(c);setTimeout(()=>c.remove(),1200)}
+
+function undo(){if(locked||!state.history.length)return;let history=state.history;state=JSON.parse(history.pop());state.history=history;save();render()}
+
+document.addEventListener('keydown',e=>{if(!state||state.completed||e.target.tagName==='TEXTAREA')return;
+if(e.key==='ArrowLeft')choose(0);else if(e.key==='ArrowRight')choose(1)});
+
+// 받침 여부에 따라 을/를 고르기 (영문으로 끝나면 읽는 소리 기준)
+function objParticle(word){const c=word.trim().slice(-1),code=c.charCodeAt(0);
+if(code>=0xAC00&&code<=0xD7A3)return (code-0xAC00)%28?'을':'를';
+return /[lmnrLMN0136780]/.test(c)?'을':'를'}
+function beatenList(w){return state.log.filter(x=>x.winner===w.id).map(x=>({round:x.round,item:ITEMS[x.loser]}))}
+
+function result(){let w=ITEMS[state.pool[0]];
+let path=beatenList(w).map(x=>`<li><span class="r">${x.round}</span><span class="o">${x.item.emoji} ${escapeHtml(x.item.name)}${objParticle(x.item.name)} 이겼어요</span></li>`).join('');
+app.innerHTML=`<section class="win"><p class="lead">32가지 중 나의 1위</p><div class="em" aria-hidden="true">${w.emoji}</div><h1>${escapeHtml(w.name)}</h1><p class="ds">${escapeHtml(w.desc)}</p><span class="cat">${escapeHtml(w.category)}</span></section>
+<section class="card"><h2>우승까지 꺾은 상대</h2><p>1위가 결승까지 올라오며 이긴 정보 탐색 방법이에요.</p><ol class="path">${path}</ol></section>
+<section class="card"><h2>나의 정보 탐색 습관 돌아보기</h2><p>왜 이 방법을 골랐나요? 여기서 찾은 정보가 정확한지는 어떻게 확인할 수 있을까요?</p>
+<textarea id="reflection" placeholder="나의 생각을 적어 보세요.">${escapeHtml(state.reflection)}</textarea>
+<div class="row"><button class="btn btn-main" id="copy">결과 이미지 복사하기</button><button class="btn btn-line" id="restart">다시 도전하기</button></div>
+<p class="copy-msg" id="copyMsg" role="status"></p>
+<p class="tip">복사한 이미지를 과제 게시판이나 채팅창에 붙여 넣으세요.</p></section>`;
+let ta=document.getElementById('reflection'),msg=document.getElementById('copyMsg');ta.oninput=()=>{state.reflection=ta.value;save()};
+document.getElementById('copy').onclick=()=>copyImage(w,ta.value,msg);
+document.getElementById('restart').onclick=()=>{if(confirm('다시 시작할까요?'))start()}}
+
+// 결과 카드를 캔버스에 그려 PNG로 만들기
+async function drawResult(w,reflection){
+try{await Promise.all([document.fonts.load('64px "Black Han Sans"'),document.fonts.load('600 28px Pretendard'),document.fonts.load('400 28px Pretendard')])}catch(e){}
+const W=1080,P=72,D='"Black Han Sans",Pretendard,sans-serif',B='Pretendard,system-ui,"Malgun Gothic",sans-serif',EMO='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const C={peach:'#ffbe98',mocha:'#a47864',ink:'#2b1d17',paper:'#f5f1ee',soft:'#7a675d',white:'#ffffff'};
+const m=document.createElement('canvas').getContext('2d');
+function wrap(text,font,max){m.font=font;const out=[];for(const para of String(text).split('\n')){let line='';for(const ch of para){const t=line+ch;if(m.measureText(t).width>max&&line){const sp=line.lastIndexOf(' ');if(sp>0&&ch!==' '){out.push(line.slice(0,sp));line=line.slice(sp+1)+ch}else{out.push(line);line=ch===' '?'':ch}}else line=t}out.push(line)}return out}
+const beaten=beatenList(w),text=reflection.trim(),inner=W-P*2-64;
+const rFont=`400 30px ${B}`,rLines=text?wrap(text,rFont,inner):['적은 생각이 없어요.'];
+const heroH=520,pathH=96+beaten.length*64+20,refH=96+rLines.length*46+32,H=P+heroH+32+pathH+32+refH+90;
+const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+const rr=(x,y,w,h,r,fill)=>{g.beginPath();g.roundRect(x,y,w,h,r);g.fillStyle=fill;g.fill()};
+g.fillStyle=C.paper;g.fillRect(0,0,W,H);g.textAlign='center';g.textBaseline='alphabetic';
+let y=P;rr(P,y,W-P*2,heroH,40,C.peach);
+g.fillStyle=C.ink;g.font=`600 30px ${B}`;g.fillText('정보 탐색 월드컵 나의 1위',W/2,y+76);
+g.font=`150px ${EMO}`;g.fillText(w.emoji,W/2,y+250);
+let size=104;g.font=`${size}px ${D}`;while(g.measureText(w.name).width>W-P*2-80&&size>48){size-=4;g.font=`${size}px ${D}`}
+g.fillText(w.name,W/2,y+390);
+g.font=`400 32px ${B}`;g.fillText(w.desc,W/2,y+446);
+g.font=`700 24px ${B}`;const cw=g.measureText(w.category).width+40;rr(W/2-cw/2,y+470,cw,40,20,'rgba(43,29,23,.12)');g.fillStyle=C.ink;g.fillText(w.category,W/2,y+499);
+y+=heroH+32;g.textAlign='left';
+rr(P,y,W-P*2,pathH,32,C.white);g.fillStyle=C.ink;g.font=`40px ${D}`;g.fillText('우승까지 꺾은 상대',P+32,y+68);
+beaten.forEach((x,i)=>{const ry=y+96+i*64;rr(P+32,ry,W-P*2-64,52,16,C.paper);g.fillStyle=C.ink;g.font=`26px ${D}`;g.fillText(x.round,P+56,ry+36);g.font=`26px ${EMO}`;g.fillText(x.item.emoji,P+160,ry+36);g.font=`600 26px ${B}`;g.fillText(`${x.item.name}${objParticle(x.item.name)} 이겼어요`,P+202,ry+36)});
+y+=pathH+32;
+rr(P,y,W-P*2,refH,32,C.white);g.fillStyle=C.ink;g.font=`40px ${D}`;g.fillText('나의 생각',P+32,y+68);
+g.font=rFont;g.fillStyle=text?C.ink:C.soft;rLines.forEach((l,i)=>g.fillText(l,P+32,y+122+i*46));
+y+=refH;g.textAlign='center';g.fillStyle=C.soft;g.font=`500 24px ${B}`;
+const d=new Date();g.fillText(`디지털 리터러시 수업  ${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`,W/2,y+56);
+return new Promise(res=>cv.toBlob(res,'image/png'))}
+
+async function copyImage(w,reflection,msg){const btn=document.getElementById('copy');btn.disabled=true;msg.textContent='이미지를 만들고 있어요...';
+const blobP=drawResult(w,reflection);
+try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error('unsupported');
+await navigator.clipboard.write([new ClipboardItem({'image/png':blobP})]);
+msg.textContent='결과 이미지를 복사했어요. 원하는 곳에 붙여 넣으세요.'}
+catch(e){const blob=await blobP;showShot(blob);msg.textContent='이 브라우저는 바로 복사할 수 없어요. 열린 이미지를 직접 복사하세요.'}
+finally{btn.disabled=false}}
+
+function showShot(blob){const url=URL.createObjectURL(blob),o=document.createElement('div');o.className='shot';o.setAttribute('role','dialog');o.setAttribute('aria-label','결과 이미지');
+o.innerHTML=`<img src="${url}" alt="정보 탐색 월드컵 결과 이미지"><p>이미지를 오른쪽 클릭하거나 길게 눌러 복사하세요.</p><button class="btn btn-line">닫기</button>`;
+const close=()=>{o.remove();URL.revokeObjectURL(url)};o.querySelector('button').onclick=close;o.onclick=e=>{if(e.target===o)close()};document.body.appendChild(o);o.querySelector('button').focus()}
+render();
+</script></body></html>
